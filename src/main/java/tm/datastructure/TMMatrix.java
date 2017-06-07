@@ -1,6 +1,12 @@
 package tm.datastructure;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.*;
+
+import tm.cvs.CSVUtils;
 
 /**
  * Created by Anthony Tjuatja on 6/7/2017.
@@ -9,11 +15,11 @@ import java.util.*;
 
 public class TMMatrix {
 
-    private HashMap<Integer, HashMap<String, Integer>> docsWordCountMat = new HashMap<>();
-    private ArrayList<Integer> wordsCount = new ArrayList<>();
-    private HashMap<Integer, HashMap<String, Float>> normDocsWordCountMat = new HashMap<>();
+    private HashMap<Integer, HashMap<String, Integer>> docsWordCountMat = new HashMap<Integer, HashMap<String, Integer>>();
+    private ArrayList<Integer> wordsCount = new ArrayList<Integer>();
+    private HashMap<Integer, HashMap<String, Float>> normDocsWordCountMat = new HashMap<Integer, HashMap<String, Float>>();
     //private INDArray normDocsMat;
-    private Set<String> vocab = new HashSet<>();
+    private Set<String> vocab = new HashSet<String>();
     private double[][] simMatrix;
 
 
@@ -85,7 +91,27 @@ public class TMMatrix {
             vocab.forEach((word) -> simMatrix[fDIn][sDIn] += Math.pow(fDN.get(word) - sDN.get(word), 2));
             simMatrix[fDIn][sDIn] = Math.sqrt(simMatrix[fDIn][sDIn]);
         }));
-
     }
+    
+    public synchronized void writeToCSV() {
+    	try (PrintWriter out = new PrintWriter(String.format("src/main/resources/test.csv"))) {
+	    	for(int row = 0 ; row < docsWordCountMat.size() ; row++) {
+		    	List<String> rowSimMatrix = new ArrayList<String>();
+		    	for (int col = 0 ; col < docsWordCountMat.size() ; col++){
+		    		rowSimMatrix.add(String.valueOf(simMatrix[row][col]));
+		    	}
+		    	
+		    	CSVUtils.writeLine(out, rowSimMatrix);
+	    	}
+    	} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
 
+    
 }

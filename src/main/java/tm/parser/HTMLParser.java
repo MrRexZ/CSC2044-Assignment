@@ -26,15 +26,14 @@ public class HTMLParser {
             "https://patents.google.com/patent/US20080183593A1/en?q=Google&assignee=Google+Inc.&page=1",
             "https://patents.google.com/patent/US7933929B1/en?q=Google&assignee=Google+Inc.&page=1",
             "https://patents.google.com/patent/US8010407B1/en?q=Google&assignee=Google+Inc.&page=1",
-            "https://patents.google.com/patent/US8010407B1/en?q=Google&assignee=Google+Inc.&page=1",
             "https://patents.google.com/patent/US8504437B1/en?q=Google&assignee=Google+Inc.&page=1",
             "https://patents.google.com/patent/US8060582B2/en?q=Google&assignee=Google+Inc.&page=1",
             "https://patents.google.com/patent/US8201081B2/en?q=Google&assignee=Google+Inc.&page=1",
             "https://patents.google.com/patent/US7031961B2/en?q=Google&assignee=Google+Inc.&page=1",
             "https://patents.google.com/patent/US7664734B2/en?q=Google&assignee=Google+Inc.&page=1",
             "https://patents.google.com/patent/US8291341B2/en?q=Google&assignee=Google+Inc.&page=1",
-            "https://patents.google.com/patent/US20080172373A1/en?q=Google&assignee=Google+Inc.&page=1"
-
+            "https://patents.google.com/patent/US20080172373A1/en?q=Google&assignee=Google+Inc.&page=1",
+            "https://patents.google.com/patent/US8793509B1/en?q=google&assignee=Google+Inc.&page=2"
     };
 
     public HTMLParser() throws IOException {

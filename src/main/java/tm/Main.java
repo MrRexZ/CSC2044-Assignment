@@ -30,16 +30,16 @@ public class Main {
 
         for (int i = 0; i < 20; i++) {
             File myFile = new File(String.format("src/main/resources/desc-%d.txt", i));
-            HashMap<String, Integer> wordCount = new HashMap<>();
-            Set<String> newVocab = new HashSet<>();
-            PTBTokenizer<CoreLabel> ptbt = new PTBTokenizer<>(new FileReader(myFile),
+            HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
+            Set<String> newVocab = new HashSet<String>();
+            PTBTokenizer<CoreLabel> ptbt = new PTBTokenizer<CoreLabel>(new FileReader(myFile),
                     new CoreLabelTokenFactory(), "");
             Stemmer s = new Stemmer();
 
             while (ptbt.hasNext()) {
                 CoreLabel label = ptbt.next();
-                String stemWord = (label.word());
-                Integer stemWordCount = wordCount.get(stemWord);
+                String stemWord = (label.word().toLowerCase());
+                Integer stemWordCount = wordCount.get(s.stem(stemWord));
                 wordCount.put(stemWord, stemWordCount == null ? 1 : stemWordCount + 1);
                 newVocab.add(stemWord);
 
@@ -50,6 +50,7 @@ public class Main {
 
         tmMatrix.normalizeDocsMat();
         tmMatrix.buildSimMatrix();
+        tmMatrix.writeToCSV();
         System.out.println("FINISHED!");
     }
 
