@@ -69,7 +69,7 @@ public class Main {
             tmMatrix.insertWordCount(newVocab, wordCount);
 
         }
-
+        tmMatrix.createTfIdfMat();
         tmMatrix.normalizeDocsMat();
         tmMatrix.buildSimMatrix();
         tmMatrix.writeToCSV();

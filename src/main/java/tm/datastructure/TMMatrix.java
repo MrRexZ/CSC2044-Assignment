@@ -16,6 +16,7 @@ import tm.cvs.CSVUtils;
 public class TMMatrix {
 
     private HashMap<Integer, HashMap<String, Integer>> docsWordCountMat = new HashMap<Integer, HashMap<String, Integer>>();
+    private HashMap<Integer, HashMap<String, Double>> tfIdfMat         = new HashMap<>();
     private ArrayList<Integer> wordsCount = new ArrayList<Integer>();
     private HashMap<Integer, HashMap<String, Float>> normDocsWordCountMat = new HashMap<Integer, HashMap<String, Float>>();
     //private INDArray normDocsMat;
@@ -35,10 +36,12 @@ public class TMMatrix {
 
         //Insert updated dictionary into next row of matrix
         docsWordCountMat.put(docsWordCountMat.size(), updatedNewDocCount);
-        //Count max amount of words for the current row
+        //Count max amount of words for the current doc
         wordsCount.add(getDocWordsCount(newDocCount));
 
 
+        //Create new row for Tf-Idf matrix
+        tfIdfMat.put(tfIdfMat.size(), new HashMap<>());
         //Create new row for normalized matrix
         normDocsWordCountMat.put(normDocsWordCountMat.size(), new HashMap<>());
 
@@ -47,12 +50,25 @@ public class TMMatrix {
 
     private Integer getDocWordsCount(HashMap<String, Integer> newDocCount) {
         Integer wCount = 0;
-
-        for (Map.Entry<String, Integer> doc : newDocCount.entrySet()) {
+        for (Map.Entry<String, Integer> doc : newDocCount.entrySet())
             wCount += doc.getValue();
-        }
-
         return wCount;
+    }
+
+    public synchronized void createTfIdfMat() {
+        docsWordCountMat.forEach( (doc,wordCountDict) ->
+                wordCountDict.forEach( (word,count) ->
+                        tfIdfMat.get(doc).put(word, calculateTfIdf(word))));
+        System.out.println("s");
+    }
+
+    private double calculateTfIdf(String word) {
+        int totalDoc = docsWordCountMat.size();
+        int docWithTerm = 0;
+        for (HashMap<String, Integer> wCountMap : docsWordCountMat.values())
+            docWithTerm += wCountMap.get(word) > 0 ? 1 : 0;
+
+        return Math.log(totalDoc / (docWithTerm == 0 ? 1 : docWithTerm));
     }
 
     private void updateVocab(final Set<String> newWords, final HashMap<String, Integer> newDocCount) {
