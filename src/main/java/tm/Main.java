@@ -71,7 +71,8 @@ public class Main {
         }
         tmMatrix.createTfIdfMat();
         tmMatrix.normalizeDocsMat();
-        tmMatrix.buildSimMatrix();
+        tmMatrix.buildEucSimMatrix();
+        tmMatrix.buildCosSimMatrix();
         tmMatrix.writeToCSV();
         System.out.println("FINISHED!");
     }

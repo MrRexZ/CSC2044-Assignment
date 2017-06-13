@@ -3,7 +3,6 @@ package tm.datastructure;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.*;
 
 import tm.cvs.CSVUtils;
@@ -18,10 +17,11 @@ public class TMMatrix {
     private HashMap<Integer, HashMap<String, Integer>> docsWordCountMat = new HashMap<Integer, HashMap<String, Integer>>();
     private HashMap<Integer, HashMap<String, Double>> tfIdfMat         = new HashMap<>();
     private ArrayList<Integer> wordsCount = new ArrayList<Integer>();
-    private HashMap<Integer, HashMap<String, Float>> normDocsWordCountMat = new HashMap<Integer, HashMap<String, Float>>();
+    private HashMap<Integer, HashMap<String, Double>> normDocsWordCountMat = new HashMap<Integer, HashMap<String, Double>>();
     //private INDArray normDocsMat;
     private Set<String> vocab = new HashSet<String>();
-    private double[][] simMatrix;
+    private double[][] eucSimMatrix;
+    private double[][] cosSimMatrix;
 
 
     public TMMatrix() {
@@ -97,16 +97,37 @@ public class TMMatrix {
     }
 
 
-    private void normalizeDoc(Integer index, HashMap<String, Float> nDoc, String cDocWord, Integer cDocCount) {
-        nDoc.put(cDocWord, (float) cDocCount / wordsCount.get(index));
+    private void normalizeDoc(Integer index, HashMap<String, Double> nDoc, String cDocWord, Integer cDocCount) {
+        nDoc.put(cDocWord, (double) cDocCount / wordsCount.get(index));
     }
 
-    public synchronized void buildSimMatrix() {
-        simMatrix = new double[docsWordCountMat.size()][docsWordCountMat.size()];
+    public synchronized void buildEucSimMatrix() {
+
+        eucSimMatrix = new double[docsWordCountMat.size()][docsWordCountMat.size()];
         normDocsWordCountMat.forEach((fDIn, fDN) -> normDocsWordCountMat.forEach((sDIn, sDN) -> {
-            vocab.forEach((word) -> simMatrix[fDIn][sDIn] += Math.pow(fDN.get(word) - sDN.get(word), 2));
-            simMatrix[fDIn][sDIn] = Math.sqrt(simMatrix[fDIn][sDIn]);
+            vocab.forEach((word) -> eucSimMatrix[fDIn][sDIn] += Math.pow(fDN.get(word) - sDN.get(word), 2));
+            eucSimMatrix[fDIn][sDIn] = Math.sqrt(eucSimMatrix[fDIn][sDIn]);
         }));
+    }
+
+    public synchronized void buildCosSimMatrix() {
+        cosSimMatrix = new double[docsWordCountMat.size()][docsWordCountMat.size()];
+        for (Map.Entry<Integer, HashMap<String, Double>> fDoc : normDocsWordCountMat.entrySet())
+            for (Map.Entry<Integer, HashMap<String, Double>> sDoc : normDocsWordCountMat.entrySet()) {
+                int fDocIndex = fDoc.getKey();
+                int sDocIndex = sDoc.getKey();
+                double numerator = 0;
+                double fDoc_d = 0;
+                double sDoc_d = 0;
+                for (String word : vocab){
+                    double fDoc_nVal = fDoc.getValue().get(word);
+                    double sDoc_nVal = sDoc.getValue().get(word);
+                    numerator +=  fDoc_nVal * sDoc_nVal;
+                    fDoc_d += fDoc_nVal * fDoc_nVal;
+                    sDoc_d += sDoc_nVal * sDoc_nVal;
+                }
+                cosSimMatrix[fDocIndex][sDocIndex] = numerator / (Math.sqrt(fDoc_d) * Math.sqrt(sDoc_d));
+            }
     }
     
     public synchronized void writeToCSV() {
@@ -114,7 +135,7 @@ public class TMMatrix {
 	    	for(int row = 0 ; row < docsWordCountMat.size() ; row++) {
 		    	List<String> rowSimMatrix = new ArrayList<String>();
 		    	for (int col = 0 ; col < docsWordCountMat.size() ; col++){
-		    		rowSimMatrix.add(String.valueOf(simMatrix[row][col]));
+		    		rowSimMatrix.add(String.valueOf(eucSimMatrix[row][col]));
 		    	}
 		    	
 		    	CSVUtils.writeLine(out, rowSimMatrix);
