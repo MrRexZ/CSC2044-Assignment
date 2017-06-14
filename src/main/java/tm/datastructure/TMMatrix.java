@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import tm.cvs.CSVUtils;
 
@@ -14,12 +15,13 @@ import tm.cvs.CSVUtils;
 
 public class TMMatrix {
 
-    private HashMap<Integer, HashMap<String, Integer>> docsWordCountMat = new HashMap<Integer, HashMap<String, Integer>>();
-    private HashMap<Integer, HashMap<String, Double>> tfIdfMat         = new HashMap<>();
+    private ConcurrentHashMap<Integer, ConcurrentHashMap<String, Integer>> docsWordCountMat = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, Integer>>();
+    private ConcurrentHashMap<Integer, ConcurrentHashMap<String, Double>> tfIdfMat         =  new ConcurrentHashMap<>();
     private ArrayList<Integer> wordsCount = new ArrayList<Integer>();
-    private HashMap<Integer, HashMap<String, Double>> normDocsWordCountMat = new HashMap<Integer, HashMap<String, Double>>();
+    private ConcurrentHashMap<Integer, ConcurrentHashMap<String, Double>> normDocsWordCountMat = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, Double>>();
     //private INDArray normDocsMat;
-    private Set<String> vocab = new HashSet<String>();
+    private Set<String> vocab = ConcurrentHashMap.newKeySet(0);
+
     private double[][] eucSimMatrix;
     private double[][] cosSimMatrix;
 
@@ -28,10 +30,10 @@ public class TMMatrix {
 
     }
 
-    public synchronized void insertWordCount(Set<String> newVocab, HashMap<String, Integer> newDocCount) {
+    public synchronized void insertWordCount(Set<String> newVocab, ConcurrentHashMap<String, Integer> newDocCount) {
 
         //Set<String> newVocab = newDocVocab.stream().filter(n -> !vocab.contains(n)).collect(Collectors.toSet());
-        HashMap<String, Integer> updatedNewDocCount = newDocCount;
+        ConcurrentHashMap<String, Integer> updatedNewDocCount = newDocCount;
         updateVocab(newVocab, updatedNewDocCount);
 
         //Insert updated dictionary into next row of matrix
@@ -41,14 +43,14 @@ public class TMMatrix {
 
 
         //Create new row for Tf-Idf matrix
-        tfIdfMat.put(tfIdfMat.size(), new HashMap<>());
+        tfIdfMat.put(tfIdfMat.size(), new ConcurrentHashMap<>());
         //Create new row for normalized matrix
-        normDocsWordCountMat.put(normDocsWordCountMat.size(), new HashMap<>());
+        normDocsWordCountMat.put(normDocsWordCountMat.size(), new ConcurrentHashMap<>());
 
 
     }
 
-    private Integer getDocWordsCount(HashMap<String, Integer> newDocCount) {
+    private Integer getDocWordsCount(ConcurrentHashMap<String, Integer> newDocCount) {
         Integer wCount = 0;
         for (Map.Entry<String, Integer> doc : newDocCount.entrySet())
             wCount += doc.getValue();
@@ -59,19 +61,18 @@ public class TMMatrix {
         docsWordCountMat.forEach( (doc,wordCountDict) ->
                 wordCountDict.forEach( (word,count) ->
                         tfIdfMat.get(doc).put(word, calculateTfIdf(word))));
-        System.out.println("s");
     }
 
     private double calculateTfIdf(String word) {
         int totalDoc = docsWordCountMat.size();
         int docWithTerm = 0;
-        for (HashMap<String, Integer> wCountMap : docsWordCountMat.values())
+        for (ConcurrentHashMap<String, Integer> wCountMap : docsWordCountMat.values())
             docWithTerm += wCountMap.get(word) > 0 ? 1 : 0;
 
         return Math.log(totalDoc / (docWithTerm == 0 ? 1 : docWithTerm));
     }
 
-    private void updateVocab(final Set<String> newWords, final HashMap<String, Integer> newDocCount) {
+    private void updateVocab(final Set<String> newWords, final ConcurrentHashMap<String, Integer> newDocCount) {
 
         //Update all existing matrix
         docsWordCountMat.forEach((k, doc) -> updateDocVocab(doc, newWords));
@@ -81,7 +82,7 @@ public class TMMatrix {
         vocab.addAll(newWords);
     }
 
-    private void updateDocVocab(HashMap<String, Integer> doc, Set<String> newWords) {
+    private void updateDocVocab(ConcurrentHashMap<String, Integer> doc, Set<String> newWords) {
         for (String word : newWords)
             if (!doc.containsKey(word))
                 doc.put(word, 0);
@@ -97,7 +98,7 @@ public class TMMatrix {
     }
 
 
-    private void normalizeDoc(Integer index, HashMap<String, Double> nDoc, String cDocWord, Integer cDocCount) {
+    private void normalizeDoc(Integer index, ConcurrentHashMap<String, Double> nDoc, String cDocWord, Integer cDocCount) {
         nDoc.put(cDocWord, (double) cDocCount / wordsCount.get(index));
     }
 
@@ -111,9 +112,10 @@ public class TMMatrix {
     }
 
     public synchronized void buildCosSimMatrix() {
+
         cosSimMatrix = new double[docsWordCountMat.size()][docsWordCountMat.size()];
-        for (Map.Entry<Integer, HashMap<String, Double>> fDoc : normDocsWordCountMat.entrySet())
-            for (Map.Entry<Integer, HashMap<String, Double>> sDoc : normDocsWordCountMat.entrySet()) {
+        for (Map.Entry<Integer, ConcurrentHashMap<String, Double>> fDoc : normDocsWordCountMat.entrySet())
+            for (Map.Entry<Integer, ConcurrentHashMap<String, Double>> sDoc : normDocsWordCountMat.entrySet()) {
                 int fDocIndex = fDoc.getKey();
                 int sDocIndex = sDoc.getKey();
                 double numerator = 0;
@@ -129,7 +131,7 @@ public class TMMatrix {
                 cosSimMatrix[fDocIndex][sDocIndex] = numerator / (Math.sqrt(fDoc_d) * Math.sqrt(sDoc_d));
             }
     }
-    
+
     public synchronized void writeToCSV() {
     	try (PrintWriter out = new PrintWriter(String.format("src/main/resources/test.csv"))) {
 	    	for(int row = 0 ; row < docsWordCountMat.size() ; row++) {
