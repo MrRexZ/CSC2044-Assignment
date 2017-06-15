@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 
 import tm.cvs.CSVUtils;
 
@@ -24,29 +26,26 @@ public class TMMatrix {
 
     private double[][] eucSimMatrix;
     private double[][] cosSimMatrix;
-
+    private double[][] manSimMatrix;
 
     public TMMatrix() {
-
     }
 
-    public synchronized void insertWordCount(Set<String> newVocab, ConcurrentHashMap<String, Integer> newDocCount) {
+    public synchronized void insertWordCount(ConcurrentHashMap<String, Integer> newDocCount) {
 
         //Set<String> newVocab = newDocVocab.stream().filter(n -> !vocab.contains(n)).collect(Collectors.toSet());
-        ConcurrentHashMap<String, Integer> updatedNewDocCount = newDocCount;
-        updateVocab(newVocab, updatedNewDocCount);
+        Set<String> newVocab = newDocCount.keySet();
+        updateVocab(newVocab, newDocCount);
 
         //Insert updated dictionary into next row of matrix
-        docsWordCountMat.put(docsWordCountMat.size(), updatedNewDocCount);
+        docsWordCountMat.put(docsWordCountMat.size(), newDocCount);
         //Count max amount of words for the current doc
         wordsCount.add(getDocWordsCount(newDocCount));
-
 
         //Create new row for Tf-Idf matrix
         tfIdfMat.put(tfIdfMat.size(), new ConcurrentHashMap<>());
         //Create new row for normalized matrix
         normDocsWordCountMat.put(normDocsWordCountMat.size(), new ConcurrentHashMap<>());
-
 
     }
 
@@ -90,8 +89,8 @@ public class TMMatrix {
     }
 
     public synchronized void normalizeDocsMat() {
-        normDocsWordCountMat.forEach((k, nDoc) -> {
-            docsWordCountMat.get(k).forEach((cDocWord, cDocCount) -> {
+        normDocsWordCountMat.forEach(10,(k, nDoc) -> {
+            docsWordCountMat.get(k).forEach(10,(cDocWord, cDocCount) -> {
                 normalizeDoc(k, nDoc, cDocWord, cDocCount);
             });
         });
@@ -103,10 +102,10 @@ public class TMMatrix {
     }
 
     public synchronized void buildEucSimMatrix() {
-
         eucSimMatrix = new double[docsWordCountMat.size()][docsWordCountMat.size()];
-        normDocsWordCountMat.forEach((fDIn, fDN) -> normDocsWordCountMat.forEach((sDIn, sDN) -> {
-            vocab.forEach((word) -> eucSimMatrix[fDIn][sDIn] += Math.pow(fDN.get(word) - sDN.get(word), 2));
+        normDocsWordCountMat.forEach(10,(fDIn, fDN) ->
+                normDocsWordCountMat.forEach(10,(sDIn, sDN) -> {
+            vocab.parallelStream().forEach((word) -> eucSimMatrix[fDIn][sDIn] += Math.pow(fDN.get(word) - sDN.get(word), 2));
             eucSimMatrix[fDIn][sDIn] = Math.sqrt(eucSimMatrix[fDIn][sDIn]);
         }));
     }
@@ -132,23 +131,38 @@ public class TMMatrix {
             }
     }
 
+    public synchronized void buildManSimMatrix() {
+
+        manSimMatrix = new double[docsWordCountMat.size()][docsWordCountMat.size()];
+        BinaryOperator<Double> findCoorDif = (c1,c2) -> c1-c2;
+        normDocsWordCountMat.forEach(10,(fDIn, fDN) ->
+                normDocsWordCountMat.forEach(10,(sDIn, sDN) ->
+                    vocab.parallelStream().forEach((word) -> manSimMatrix[fDIn][sDIn] += Math.abs(fDN.get(word) - sDN.get(word))
+                )));
+    }
+
     public synchronized void writeToCSV() {
-    	try (PrintWriter out = new PrintWriter(String.format("src/main/resources/test.csv"))) {
-	    	for(int row = 0 ; row < docsWordCountMat.size() ; row++) {
-		    	List<String> rowSimMatrix = new ArrayList<String>();
-		    	for (int col = 0 ; col < docsWordCountMat.size() ; col++){
-		    		rowSimMatrix.add(String.valueOf(eucSimMatrix[row][col]));
-		    	}
-		    	
-		    	CSVUtils.writeLine(out, rowSimMatrix);
-	    	}
-    	} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        createCSV(eucSimMatrix, "src/main/resources/eucSim.csv");
+        createCSV(cosSimMatrix,"src/main/resources/cosSim.csv");
+        createCSV(manSimMatrix, "src/main/resources/manSim.csv");
+    }
+
+    private void createCSV(double[][] fMatrix, String outPath) {
+        try (PrintWriter out = new PrintWriter(String.format(outPath))) {
+            for(int row = 0 ; row < docsWordCountMat.size() ; row++) {
+                List<String> rowSimMatrix = new ArrayList<String>();
+                for (int col = 0 ; col < docsWordCountMat.size() ; col++){
+                    rowSimMatrix.add(String.valueOf(fMatrix[row][col]));
+                }
+                CSVUtils.writeLine(out, rowSimMatrix);
+            }
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
     
 

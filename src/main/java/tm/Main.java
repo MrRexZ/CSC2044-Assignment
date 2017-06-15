@@ -52,7 +52,6 @@ public class Main {
             for (int i = 0; i < 20; i++) {
                 File myFile = new File(String.format("src/main/resources/desc-%d.txt", i));
                 ConcurrentHashMap<String, Integer> wordCount = new ConcurrentHashMap<String, Integer>();
-                Set<String> newVocab = new HashSet<String>();
                 PTBTokenizer<CoreLabel> ptbt = new PTBTokenizer<CoreLabel>(new FileReader(myFile),
                         new CoreLabelTokenFactory(), "");
                 Stemmer s = new Stemmer();
@@ -65,16 +64,16 @@ public class Main {
                         String stemWord = (s.stem(word.toLowerCase()));
                         Integer stemWordCount = wordCount.get(stemWord);
                         wordCount.put(stemWord, stemWordCount == null ? 1 : stemWordCount + 1);
-                        newVocab.add(stemWord);
                     }
 
                 }
-                tmMatrix.insertWordCount(newVocab, wordCount);
+                tmMatrix.insertWordCount(wordCount);
 
             }
             tmMatrix.createTfIdfMat();
             tmMatrix.normalizeDocsMat();
             tmMatrix.buildEucSimMatrix();
+            tmMatrix.buildManSimMatrix();
 
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) / 1000000;
