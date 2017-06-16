@@ -45,7 +45,7 @@ public class HTMLParser {
         try {
             Document mainDoc = Jsoup.connect(MASTER_URL).get();
             for (int i = 0; i < 20; i++) {
-                System.out.println("Parsing : " + i);
+                System.out.println("Parsing document number : " + i);
                 Document doc = Jsoup.connect(urls[i]).get();
                 Element searchApp = doc.select("search-app").first();
                 String textdesc = searchApp.select("section[itemprop=description]").first().select("[mxw-id]").first().text();
@@ -57,7 +57,4 @@ public class HTMLParser {
             e.printStackTrace();
         }
     }
-
-
-
 }

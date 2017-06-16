@@ -78,12 +78,12 @@ public class Main {
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) / 1000000;
             avg += duration;
-            System.out.println(duration);
+            System.out.println("Iteration" + x + " : "+ duration);
             tmMatrix.buildCosSimMatrix();
             tmMatrix.writeToCSV();
             //System.out.println("FINISHED!");
         }
-        System.out.println(avg/10);
+        System.out.println("Average running time : " + avg/10);
     }
 
     static String readFile(String path, Charset encoding)
