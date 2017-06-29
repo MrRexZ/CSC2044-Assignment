@@ -1,13 +1,29 @@
 package tm.cvs;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class CSVUtils {
 
     private static final char DEFAULT_SEPARATOR = ',';
 
+    public static double[][] readCSV(File file) throws FileNotFoundException {
+        Scanner sc = new Scanner(file);
+        ArrayList<double[]> simMatrix = new ArrayList<>();
+        while (sc.hasNext()) {
+            double[] arr = Arrays.stream(sc.next().split(","))
+                    .mapToDouble(Double::parseDouble)
+                    .toArray();
+            simMatrix.add(arr);
+        }
+        return simMatrix.toArray(new double[simMatrix.size()][]);
+    }
     public static void writeLine(Writer w, List<String> values) throws IOException {
         writeLine(w, values, DEFAULT_SEPARATOR, ' ');
     }
@@ -24,7 +40,6 @@ public class CSVUtils {
             result = result.replace("\"", "\"\"");
         }
         return result;
-
     }
 
     public static void writeLine(Writer w, List<String> values, char separators, char customQuote) throws IOException {
@@ -47,13 +62,10 @@ public class CSVUtils {
             } else {
                 sb.append(customQuote).append(followCVSformat(value)).append(customQuote);
             }
-
             first = false;
         }
         sb.append("\n");
         w.append(sb.toString());
-
-
     }
 
 }

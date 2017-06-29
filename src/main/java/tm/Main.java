@@ -3,11 +3,13 @@ package tm;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.process.CoreLabelTokenFactory;
 import edu.stanford.nlp.process.PTBTokenizer;
+import smile.util.SmileUtils;
 import tm.cvs.CSVUtils;
 import tm.datastructure.*;
 import tm.executors.InsertionRunnable;
 import tm.stemmer.Stemmer;
-
+import smile.clustering.SpectralClustering;
+import smile.plot.*;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -16,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.*;
 
 /**
  * Created by Anthony Tjuatja on 6/7/2017.
@@ -23,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
 
-    static AtomicInteger nDocs = new AtomicInteger();
+    private static AtomicInteger nDocs = new AtomicInteger();
 
     public static void main(String[] args) throws IOException {
         double avg = 0;
@@ -57,7 +60,7 @@ public class Main {
         ExecutorService docsExecutors = Executors.newCachedThreadPool();
 
         List<Future> insertionRunnables = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 20; i++) {
             nDocs.incrementAndGet();
             insertionRunnables.add(docsExecutors.submit(new InsertionRunnable(i, stopWordsSet, docsWordMatrix, tfIdfMatrix, normsDocWordMatrix, vocab)));
         }
@@ -81,9 +84,6 @@ public class Main {
         avg += duration;
         System.out.println("FINISHED!");
     }
-
-
-
 
     static synchronized void writeToCSV(double[][] eucSimMatrix, double[][] cosSimMatrix, double[][] manSimMatrix) {
         createCSV(eucSimMatrix, "src/main/resources/eucSim.csv");
@@ -109,11 +109,4 @@ public class Main {
         }
     }
 
-
-
-    static String readFile(String path, Charset encoding)
-            throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
-    }
 }
