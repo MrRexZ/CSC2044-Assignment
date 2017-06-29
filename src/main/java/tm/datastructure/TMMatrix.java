@@ -46,7 +46,6 @@ public class TMMatrix {
         tfIdfMat.put(tfIdfMat.size(), new ConcurrentHashMap<>());
         //Create new row for normalized matrix
         normDocsWordCountMat.put(normDocsWordCountMat.size(), new ConcurrentHashMap<>());
-
     }
 
     private Integer getDocWordsCount(ConcurrentHashMap<String, Integer> newDocCount) {
@@ -89,8 +88,8 @@ public class TMMatrix {
     }
 
     public synchronized void normalizeDocsMat() {
-        normDocsWordCountMat.forEach(10,(k, nDoc) -> {
-            docsWordCountMat.get(k).forEach(10,(cDocWord, cDocCount) -> {
+        normDocsWordCountMat.forEach((k, nDoc) -> {
+            docsWordCountMat.get(k).forEach((cDocWord, cDocCount) -> {
                 normalizeDoc(k, nDoc, cDocWord, cDocCount);
             });
         });
@@ -103,15 +102,14 @@ public class TMMatrix {
 
     public synchronized void buildEucSimMatrix() {
         eucSimMatrix = new double[docsWordCountMat.size()][docsWordCountMat.size()];
-        normDocsWordCountMat.forEach(10,(fDIn, fDN) ->
-                normDocsWordCountMat.forEach(10,(sDIn, sDN) -> {
-            vocab.parallelStream().forEach((word) -> eucSimMatrix[fDIn][sDIn] += Math.pow(fDN.get(word) - sDN.get(word), 2));
+        normDocsWordCountMat.forEach((fDIn, fDN) ->
+                normDocsWordCountMat.forEach((sDIn, sDN) -> {
+            vocab.forEach((word) -> eucSimMatrix[fDIn][sDIn] += Math.pow(fDN.get(word) - sDN.get(word), 2));
             eucSimMatrix[fDIn][sDIn] = Math.sqrt(eucSimMatrix[fDIn][sDIn]);
         }));
     }
 
     public synchronized void buildCosSimMatrix() {
-
         cosSimMatrix = new double[docsWordCountMat.size()][docsWordCountMat.size()];
         for (Map.Entry<Integer, ConcurrentHashMap<String, Double>> fDoc : normDocsWordCountMat.entrySet())
             for (Map.Entry<Integer, ConcurrentHashMap<String, Double>> sDoc : normDocsWordCountMat.entrySet()) {
@@ -134,10 +132,9 @@ public class TMMatrix {
     public synchronized void buildManSimMatrix() {
 
         manSimMatrix = new double[docsWordCountMat.size()][docsWordCountMat.size()];
-        BinaryOperator<Double> findCoorDif = (c1,c2) -> c1-c2;
-        normDocsWordCountMat.forEach(10,(fDIn, fDN) ->
-                normDocsWordCountMat.forEach(10,(sDIn, sDN) ->
-                    vocab.parallelStream().forEach((word) -> manSimMatrix[fDIn][sDIn] += Math.abs(fDN.get(word) - sDN.get(word))
+        normDocsWordCountMat.forEach((fDIn, fDN) ->
+                normDocsWordCountMat.forEach((sDIn, sDN) ->
+                    vocab.forEach((word) -> manSimMatrix[fDIn][sDIn] += Math.abs(fDN.get(word) - sDN.get(word))
                 )));
     }
 
@@ -164,7 +161,4 @@ public class TMMatrix {
             e.printStackTrace();
         }
     }
-    
-
-    
 }

@@ -48,9 +48,8 @@ public class Main {
                 e.printStackTrace();
             }
 
-
-            for (int i = 0; i < 20; i++) {
-                File myFile = new File(String.format("src/main/resources/desc-%d.txt", i));
+            for (int i = 1; i < 3; i++) {
+                File myFile = new File(String.format("src/main/resources/d-%d.txt", i));
                 ConcurrentHashMap<String, Integer> wordCount = new ConcurrentHashMap<String, Integer>();
                 PTBTokenizer<CoreLabel> ptbt = new PTBTokenizer<CoreLabel>(new FileReader(myFile),
                         new CoreLabelTokenFactory(), "");
@@ -84,6 +83,10 @@ public class Main {
             //System.out.println("FINISHED!");
         }
         System.out.println("Average running time : " + avg/10);
+    }
+
+    static boolean isAWord(String word) {
+        return !word.replaceAll("[^a-zA-Z ]", "").equals("");
     }
 
     static String readFile(String path, Charset encoding)
