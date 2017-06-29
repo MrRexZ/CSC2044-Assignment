@@ -62,7 +62,7 @@ public class Main {
             ExecutorService docsExecutors = Executors.newCachedThreadPool();
 
             List<Future> insertionRunnables = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 20; i++) {
                 nDocs.incrementAndGet();
                 insertionRunnables.add(docsExecutors.submit(new InsertionRunnable(i, stopWordsSet, docsWordMatrix, tfIdfMatrix, normsDocWordMatrix, vocab)));
             }

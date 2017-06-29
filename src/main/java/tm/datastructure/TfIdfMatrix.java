@@ -18,7 +18,7 @@ public class TfIdfMatrix {
         int totalDoc = docsWordMatrix.docsWordCountMat.size();
         int docWithTerm = 0;
         for (ConcurrentHashMap<String, Integer> wCountMap : docsWordMatrix.docsWordCountMat.values())
-            docWithTerm += wCountMap.contains(word) ? wCountMap.get(word) > 0 ? 1 : 0 : 0;
+            docWithTerm += wCountMap.get(word) > 0 ? 1 : 0;
 
         return Math.log(totalDoc / (docWithTerm == 0 ? 1 : docWithTerm));
     }

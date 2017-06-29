@@ -22,7 +22,7 @@ public class CosineSimMatrix {
                 double sDoc_d = 0;
                 for (String word : vocab) {
                     double fDoc_nVal = fDoc.getValue().get(word);
-                    double sDoc_nVal = sDoc.getValue().get(word);
+                    double sDoc_nVal =  sDoc.getValue().get(word);
                     numerator += fDoc_nVal * sDoc_nVal;
                     fDoc_d += fDoc_nVal * fDoc_nVal;
                     sDoc_d += sDoc_nVal * sDoc_nVal;
@@ -30,6 +30,7 @@ public class CosineSimMatrix {
                 cosSimMatrix[fDocIndex][sDocIndex] = numerator / (Math.sqrt(fDoc_d) * Math.sqrt(sDoc_d));
             }
     }
+
 
     public double[][] getCosSimMatrix() {
         return cosSimMatrix;

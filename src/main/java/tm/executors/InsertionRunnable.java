@@ -11,7 +11,8 @@ import tm.stemmer.Stemmer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -42,7 +43,7 @@ public class InsertionRunnable implements Runnable {
 
     @Override
     public void run() {
-        File myFile = new File(String.format("src/main/resources/d-%d.txt", id));
+        File myFile = new File(String.format("src/main/resources/desc-%d.txt", id));
         ConcurrentHashMap<String, Integer> wordCount = new ConcurrentHashMap<String, Integer>();
         PTBTokenizer<CoreLabel> ptbt = null;
         int totalWordCount = 0;
@@ -62,9 +63,9 @@ public class InsertionRunnable implements Runnable {
                 }
             }
             docsWordMatrix.wordsCount.put(id, totalWordCount);
-           // synchronized (docsWordMatrix) {
-            docsWordMatrix.insertWordCount(id, wordCount, tfIdfMatrix.tfIdfMat, normsDocWordMatrix.normDocsWordCountMat, vocab);
-          //  }
+            synchronized (docsWordMatrix) {
+                docsWordMatrix.insertWordCount(id, wordCount, tfIdfMatrix.tfIdfMat, normsDocWordMatrix.normDocsWordCountMat, vocab);
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

@@ -3,6 +3,10 @@ package tm.parser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -41,6 +45,7 @@ public class HTMLParser {
     }
 
     public static void main(String[] args) {
+
 
         try {
             Document mainDoc = Jsoup.connect(MASTER_URL).get();

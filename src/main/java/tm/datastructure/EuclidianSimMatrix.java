@@ -25,9 +25,6 @@ public class EuclidianSimMatrix {
         task.get();
     }
 
-//    private boolean getWordVal(ConcurrentHashMap<String,Integer> map, String word) {
-//        return map.contains(word);
-//    }
 
     public double[][] getEucSimMatrix() {
         return eucSimMatrix;

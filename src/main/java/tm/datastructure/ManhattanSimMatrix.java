@@ -15,7 +15,7 @@ public class ManhattanSimMatrix {
     private double[][] manSimMatrix;
 
     public synchronized void buildManSimMatrix(DocsWordMatrix docsWordMatrix, NormsDocWordMatrix normsDocWordMatrix, Set<String> vocab) throws ExecutionException, InterruptedException {
-        ForkJoinPool forkJoinPool = new ForkJoinPool(8);
+        ForkJoinPool forkJoinPool = new ForkJoinPool(4);
         Future task = forkJoinPool.submit(() -> {
             ConcurrentHashMap<Integer, ConcurrentHashMap<String, Integer>> docsWordCountMat = docsWordMatrix.docsWordCountMat;
             ConcurrentHashMap<Integer, ConcurrentHashMap<String, Double>> normDocsWordCountMat = normsDocWordMatrix.normDocsWordCountMat;
@@ -25,10 +25,9 @@ public class ManhattanSimMatrix {
                             vocab.parallelStream().forEach((word) -> manSimMatrix[fDIn][sDIn] += Math.abs(fDN.get(word) - sDN.get(word))
                             )));
         });
-
         task.get();
-
     }
+
 
     public double[][] getManSimMatrix() {
         return manSimMatrix;
