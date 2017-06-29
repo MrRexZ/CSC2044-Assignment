@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CosineSimMatrix {
     private double[][] cosSimMatrix;
 
-    public synchronized void buildCosSimMatrix(DocsWordMatrix docsWordMatrix, NormsDocWordMatrix normsDocWordMatrix, Set<String> vocab) {
+    public void buildCosSimMatrix(DocsWordMatrix docsWordMatrix, NormsDocWordMatrix normsDocWordMatrix, Set<String> vocab) {
 
         cosSimMatrix = new double[docsWordMatrix.docsWordCountMat.size()][docsWordMatrix.docsWordCountMat.size()];
         for (Map.Entry<Integer, ConcurrentHashMap<String, Double>> fDoc : normsDocWordMatrix.normDocsWordCountMat.entrySet())

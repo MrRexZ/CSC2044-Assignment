@@ -42,7 +42,7 @@ public class InsertionRunnable implements Runnable {
 
     @Override
     public void run() {
-        File myFile = new File(String.format("src/main/resources/desc-%d.txt", id));
+        File myFile = new File(String.format("src/main/resources/d-%d.txt", id));
         ConcurrentHashMap<String, Integer> wordCount = new ConcurrentHashMap<String, Integer>();
         PTBTokenizer<CoreLabel> ptbt = null;
         int totalWordCount = 0;
@@ -62,9 +62,9 @@ public class InsertionRunnable implements Runnable {
                 }
             }
             docsWordMatrix.wordsCount.put(id, totalWordCount);
-            synchronized (docsWordMatrix) {
-                docsWordMatrix.insertWordCount(id, wordCount, tfIdfMatrix.tfIdfMat, normsDocWordMatrix.normDocsWordCountMat, vocab);
-            }
+           // synchronized (docsWordMatrix) {
+            docsWordMatrix.insertWordCount(id, wordCount, tfIdfMatrix.tfIdfMat, normsDocWordMatrix.normDocsWordCountMat, vocab);
+          //  }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
