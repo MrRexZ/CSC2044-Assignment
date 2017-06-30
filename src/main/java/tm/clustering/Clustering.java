@@ -33,19 +33,19 @@ public class Clustering extends JPanel {
     public Clustering() throws URISyntaxException, IOException, ParseException {
 
         setLayout(new BorderLayout());
-        double[][] euclidianSimMatrix = CSVUtils.readCSV(new File(Main.class.getClassLoader().getResource("eucSim.csv").toURI()));
-        double[][] coor = IntStream.range(0 , euclidianSimMatrix.length).
-                mapToObj(x -> new double[] {x / 5, x % 5}).toArray(double[][]::new);
+
         DelimitedTextParser parser = new DelimitedTextParser();
         parser.setDelimiter(",");
-        AttributeDataset data = parser.parse("TestDataset", new File(Main.class.getClassLoader().getResource("eucSim.csv").toURI()) );
+        AttributeDataset data = parser.parse("Euclidian Dataset", new File(Main.class.getClassLoader().getResource("eucSim.csv").toURI()));
         double[][] dataset = data.toArray(new double[data.size()][]);
-        SpectralClustering spectral = new SpectralClustering(euclidianSimMatrix, 10, 0.2);
+        double[][] coor = IntStream.range(0 , dataset.length).
+                mapToObj(x -> new double[] {x / 5, x % 5}).toArray(double[][]::new);
+        SpectralClustering spectral = new SpectralClustering(dataset, 10, 0.2);
         PlotCanvas plot = ScatterPlot.plot(coor, 'o');
 
         for (int k = 0; k < spectral.getNumClusters(); k++) {
             double[][] cluster = new double[spectral.getClusterSize()[k]][];
-            for (int i = 0, j = 0; i < euclidianSimMatrix.length; i++) {
+            for (int i = 0, j = 0; i < dataset.length; i++) {
                 if (spectral.getClusterLabel()[i] == k) {
                     cluster[j++] = new double[] {i / 5, i % 5};
                 }
