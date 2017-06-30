@@ -28,12 +28,8 @@ import java.util.stream.IntStream;
 /**
  * Created by Anthony Tjuatja on 6/29/2017.
  */
-public class Clustering extends JPanel implements ActionListener,AncestorListener {
-    private JTextField clusterNumberField;
-    private JButton startButton;
-    private JComboBox<String> datasetBox;
-    JPanel optionPane;
-    JComponent plotCanvas;
+public class Clustering extends JPanel {
+
     public Clustering() throws URISyntaxException, IOException, ParseException {
 
         setLayout(new BorderLayout());
@@ -76,26 +72,5 @@ public class Clustering extends JPanel implements ActionListener,AncestorListene
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.getContentPane().add(clustering);
         f.setVisible(true);
-
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
-
-    @Override
-    public void ancestorAdded(AncestorEvent event) {
-
-    }
-
-    @Override
-    public void ancestorRemoved(AncestorEvent event) {
-
-    }
-
-    @Override
-    public void ancestorMoved(AncestorEvent event) {
-
     }
 }

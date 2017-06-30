@@ -7,6 +7,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,10 +23,8 @@ public class Crawler {
         WebDriver driver = new RemoteWebDriver(new URL("http://localhost:9515"), DesiredCapabilities.chrome());
 
         final String baseURL = "https://patents.google.com/";
-        // Go to the Google Suggest home page
         driver.get(baseURL);
 
-        // Enter the query string "Cheese"
         WebElement query = driver.findElement(By.name("q"));
         WebElement submitButton = driver.findElement(By.id("searchButton"));
         query.sendKeys("Google");
@@ -32,8 +32,8 @@ public class Crawler {
 
 
         while (listOfPatentsURL.size() < 20) {
-            // Sleep until the div we want is visible or 5 seconds is over
-            long end = System.currentTimeMillis() + 200000;
+            System.out.println(driver.getCurrentUrl());
+            long end = System.currentTimeMillis() + 20000;
             while (System.currentTimeMillis() < end) {
                 ArrayList<WebElement> resultsDiv = (ArrayList<WebElement>) driver.findElements(By.tagName("search-result-item"));
                 if (resultsDiv.size() > 0) {
@@ -47,7 +47,9 @@ public class Crawler {
                 System.out.println(result.getAttribute("open-result"));
             }
 
-            WebElement nextButton = driver.findElement(By.xpath("//state-modifier[@page='next']"));
+            Thread.sleep(1000);
+            System.out.println();
+            WebElement nextButton = new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//state-modifier[@page='next']"))));
             nextButton.click();
         }
         driver.quit();
