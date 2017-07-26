@@ -53,14 +53,9 @@ public class Clustering extends JPanel {
             plot.points(cluster, 'o', Palette.COLORS[k % Palette.COLORS.length]);
         }
 
-       // plotCanvas = ScatterPlot.plot(coor, spectral.getClusterLabel(), 'o', Palette.COLORS);
+
         add(plot, BorderLayout.CENTER);
 
-//        try {
-//            plotCanvas.save();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     public static void main(String[] args) throws IOException, URISyntaxException, ParseException {
