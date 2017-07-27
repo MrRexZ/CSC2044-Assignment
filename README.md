@@ -36,12 +36,12 @@ The files will be prefixed by `desc-`, and followed by the iteration identifier.
 As an example, I used first 20 documents.
 
 
-##2. Tokenizing
+## 2. Tokenizing
 The tokenization is based on a slightly modified Penn Treebank Tokenizer algorithm based on Stanford CoreNLP library.
 It tokenizes a string into a block of textual units, and regex for word detection is utilized to ensure only words
 are extracted, and a stopwords filter is applied as well to prevent the common appearing words to be weighted into calculation.
 
-##3. Stemming
+## 3. Stemming
 The stemming uses Porter Stemming Algorithm, taken from Stanford NLP.
 The stemming does not yield accurate stem words on some instances (nor does any other
 stemming algorithm), but for the objective of this assignment, as long as the multiple types of
@@ -50,7 +50,7 @@ but still the same base form, is enough as it doesn’t affect the correctness, 
 the visual display to humans.
 
 
-##4. Topic Modelling Algorithm
+## 4. Topic Modelling Algorithm
 The algorithm implements concurrent processing, in that it reads the output from the HTML
 parser and aims to submit each of the document into the cached threadpool.
 Each of the thread in the threadpool process the insertion of the patents description topic
@@ -66,7 +66,7 @@ environment due to the performance improvement/effort ratio that is rather low.
 The output will be saved as `eucSim.csv` for Euclidian Similarity Matrix, `cosSim.csv` for Cosine Similarity Matrix,
 and `manSim.csv` for Manchester Distance Similarity Matrix.
 
-##5. Spectral Clustering
+## 5. Spectral Clustering
 Spectral Clustering is the clustering methodology used in the assignment, using the smile
 framework as described above in the introduction.
 The Spectral Clustering performs clustering of the 20 document classes.
