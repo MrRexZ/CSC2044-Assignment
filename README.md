@@ -5,7 +5,7 @@ It is composed of of several modules such as web crawling, filtering stop words,
 building 3 similarity metrics matrices, and spectral clustering. 
 There are 3 main entry-points, in the java class `Crawler`, `Main` and `Clustering`.
 
-## 1.Requirements
+## Requirements
 1.[Stanford CoreNLP](https://stanfordnlp.github.io/CoreNLP/)
 
 2.[JSoup](https://jsoup.org/)
@@ -13,7 +13,6 @@ There are 3 main entry-points, in the java class `Crawler`, `Main` and `Clusteri
 3.[smile](https://github.com/haifengl/smile/)
 
 4.[Selenium Web Driver](https://github.com/SeleniumHQ/selenium)
-
 
 ## 1.Web Crawling
 The module uses Selenium `Web Driver` and `JSoup`.
